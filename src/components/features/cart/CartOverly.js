@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { CiSquarePlus, CiSquareMinus } from "react-icons/ci";
-import CartAttributes from "./CartAttributes"; // Assuming you have the ProductAttributes component
+import CartAttributes from "./CartAttributes"; 
 import { Mutation } from "@apollo/client/react/components";
-import { CREATE_ORDER } from "../../../graphql/mutation"; // Import the mutation
+import { CREATE_ORDER } from "../../../graphql/mutation"; 
 import { MdDelete } from "react-icons/md";
 
 class CartOverlay extends Component {
@@ -12,38 +12,30 @@ class CartOverlay extends Component {
       cartItems: JSON.parse(localStorage.getItem("cart")) || [],
       totalItems: 0,
       noProducts: false,
+      hoveredIndex: null, 
     };
   }
-  // Lifecycle method called when the component is mounted
+ 
   componentDidMount() {
-    // Retrieve cart items from localStorage, defaulting to an empty array if none exist
     const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Calculate the total number of items in the cart
     const totalItems = cartItems.reduce((total, item) => {
       const quantity =
         item.quantity && typeof item.quantity === "number" && item.quantity > 0
-          ? item.quantity // If quantity is valid, use it
-          : 1; // Default to 1 if no valid quantity exists
+          ? item.quantity 
+          : 1; 
       return total + quantity;
     }, 0);
 
-    // Update component state with the total number of items in the cart
     this.setState({ totalItems });
-
-    // Disable body scroll to focus on the cart (could be useful if it's a modal)
     document.body.style.overflow = "hidden";
   }
 
-  // Lifecycle method called when the component will unmount
   componentWillUnmount() {
-    // Restore body scroll behavior when the cart is closed or component is unmounted
     document.body.style.overflow = "auto";
   }
 
-  // Handle removing an item from the cart based on product ID and selected attributes
   handleRemoveFromCart = (productId, selectedAttributes) => {
-    // Filter out the item that matches the provided product ID and selected attributes
     const updatedCart = this.state.cartItems.filter(
       (item) =>
         !(
@@ -53,58 +45,46 @@ class CartOverlay extends Component {
         )
     );
 
-    // Update the component state with the updated cart
     this.setState({ cartItems: updatedCart });
 
-    // Recalculate the total number of items after removal
     const totalItems = updatedCart.reduce((total, item) => {
       const quantity =
         item.quantity && typeof item.quantity === "number" && item.quantity > 0
           ? item.quantity
-          : 1; // Default to 1 if no valid quantity exists
+          : 1; 
       return total + quantity;
     }, 0);
 
-    // Update state with new total number of items
     this.setState({ totalItems });
 
-    // Save updated cart data to localStorage
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Handle updating the quantity of an item in the cart
   handleUpdateQuantity = (productId, selectedAttributes, quantity) => {
-    // Update the quantity of the item in the cart, ensuring it doesn't go below 1
     const updatedCart = this.state.cartItems.map((item) =>
       item.id === productId &&
       JSON.stringify(item.selectedAttributes) ===
         JSON.stringify(selectedAttributes)
-        ? { ...item, quantity: Math.max(1, quantity) } // Ensure quantity is at least 1
+        ? { ...item, quantity: Math.max(1, quantity) } 
         : item
     );
 
-    // Update the state with the updated cart
     this.setState({ cartItems: updatedCart });
 
-    // Save the updated cart back to localStorage
     localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-    // Recalculate the total number of items after the update
     const totalItems = updatedCart.reduce((total, item) => {
       const quantity =
         item.quantity && typeof item.quantity === "number" && item.quantity > 0
           ? item.quantity
-          : 1; // Default to 1 if no valid quantity exists
+          : 1;
       return total + quantity;
     }, 0);
 
-    // Update the state with the new total number of items
     this.setState({ totalItems });
   };
 
-  // Handle changing attributes (e.g., size, color) of an item in the cart
   handleAttributeChange = (productId, selectedAttributes) => {
-    // Update the attributes of the item in the cart by merging with the existing ones
     const updatedCart = this.state.cartItems.map((item) =>
       item.id === productId
         ? {
@@ -117,64 +97,59 @@ class CartOverlay extends Component {
         : item
     );
 
-    // Update the component state with the updated cart
     this.setState({ cartItems: updatedCart });
-
-    // Save the updated cart to localStorage
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Calculate the total price of all items in the cart
   getTotalPrice = () => {
     return this.state.cartItems.reduce(
-      (total, item) => total + item.price[0].amount * item.quantity, // Multiply price by quantity for each item
-      0 // Start with a total of 0
+      (total, item) => total + item.price[0].amount * item.quantity, 
+      0 
     );
   };
 
-  // Handle placing an order by sending cart data to the server
   handlePlaceOrder = async (createOrder) => {
-    // Get the current time (optional for the order creation)
-    const currentTime = new Date().toLocaleTimeString();
-
-    // Format the items to be passed to the order creation
     const items = this.state.cartItems.map((item) => ({
-      productId: item.id, // Product ID
-      name: item.name, // Product name
-      price: item.price[0].amount, // Item price
-      quantity: item.quantity, // Quantity of the product
-      selectedAttributes: JSON.stringify(item.selectedAttributes), // Serialize selected attributes
-      categoryId: item.category_id, // Product category ID
-      inStock: item.inStock, // Stock status
+      productId: item.id, 
+      name: item.name, 
+      price: item.price[0].amount, 
+      quantity: item.quantity, 
+      selectedAttributes: JSON.stringify(item.selectedAttributes), 
+      categoryId: item.category_id, 
+      inStock: item.inStock, 
     }));
 
     try {
-      // Send request to create the order
       const response = await createOrder({
-        variables: {userId: "user123", items }, // Include user ID and items
+        variables: {userId: "user123", items }, 
       });
 
-      // Log the response and show success message
       console.log("Order placed successfully:", response.data);
       alert("Order placed successfully!");
 
-      // Clear the cart from both the state and localStorage
       localStorage.removeItem("cart");
       this.setState({ cartItems: [], totalItems: 0 });
 
-      // Dispatch an event to indicate cart has been updated (could trigger UI updates)
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
-      // Handle any errors during the order placement
       console.error("Error placing order:", err);
       alert("Error placing order!",err);
     }
   };
 
-  // The render method returns the JSX for the component
+
+  handleMouseEnter = (index) => {
+    this.setState({ hoveredIndex: index });
+  };
+
+  handleMouseLeave = () => {
+    this.setState({ hoveredIndex: null });
+  };
+
   render() {
     const { cartItems, totalItems } = this.state;
     const { onClose } = this.props;
+    const { hoveredIndex } = this.state;
 
     return (
       <Mutation mutation={CREATE_ORDER}>
@@ -185,19 +160,16 @@ class CartOverlay extends Component {
               className="fixed inset-0 flex justify-end "
               style={{ top: "64px", zIndex: 1000 }}
             >
-              {/* Overlay to darken the background and close the cart */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-20"
                 onClick={onClose}
               />
 
-              {/* Sidebar Container (Cart Side Panel) */}
               <div
-                className={`flex flex-col bg-white  p-4 shadow-lg relative z-50 lg:mr-12 md:mr-12 max-w-xs sm:max-w-sm sm:mr-0 ${
+                className={`flex flex-col bg-white  p-4  shadow-lg relative z-50 lg:mr-12 md:mr-15 max-w-xs sm:max-w-sm sm:mr-0 ${
                   cartItems.length === 0 ? "h-24" : "h-5/6"
                 }`}
               >
-                {/* Close Button */}
                 <button
                   className="absolute top-2 right-2 text-red-500"
                   onClick={onClose}
@@ -205,7 +177,6 @@ class CartOverlay extends Component {
                   <i className="fas fa-times"></i>
                 </button>
 
-                {/* Conditional Rendering for Empty Cart or Filled Cart */}
                 {cartItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-10 text-gray-600">
                     <i className="fas fa-shopping-cart text-4xl mb-4"></i>
@@ -219,26 +190,30 @@ class CartOverlay extends Component {
                   </div>
                 ) : (
                   <>
-                    {/* Bag Header (Cart Title with Item Count) */}
                     <h2 className="text-sm font-semibold mb-4">
                       My Bag: {totalItems} {totalItems > 1 ? "Items" : "Item"}
                     </h2>
 
-                    {/* Scrollable Section for Cart Items */}
-                    <div className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-gray-200 p-2">
+                    <div className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-gray-200 p-5">
                       {cartItems.map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between mb-2 border bg-white p-2"
-                        >
-                          {/* Left side: Product Details */}
-                          <div className="flex flex-col justify-between w-2/3 pr-2">
+                  <div
+                  key={index}
+                  onMouseEnter={() => this.handleMouseEnter(index)}
+                  onMouseLeave={this.handleMouseLeave}
+                  className={`flex justify-between mb-2 border p-2 pr-10 rounded-lg transition-all transform ${
+                    hoveredIndex === index
+                      ? "bg-white shadow-lg border-gray-400" 
+                      : hoveredIndex !== null
+                      ? "bg-gray-100 border-gray-300" 
+                      : "bg-white border-gray-300" 
+                  }`}
+                >
+                          <div className="flex flex-col justify-between w-2/3 pr-2 mr-5">
                             <h3 className="text-sm font-semibold">
                               {item.name}
                             </h3>
                             <p className="text-sm">${item.price[0].amount}</p>
 
-                            {/* Display Attributes if Available (size, color, etc.) */}
                             {item.attributes.length > 0 && (
                               <CartAttributes
                                 attributes={item.attributes}
@@ -253,12 +228,10 @@ class CartOverlay extends Component {
                             )}
                           </div>
 
-                          {/* Right side: Image, Quantity Control and Remove Button */}
                           <div className="w-full sm:w-2/3 flex flex-col items-center">
                             <div className="flex items-center mb-4 w-full justify-between">
-                              {/* Quantity Controls and Image Container */}
                               <div className="flex flex-col items-center w-full">
-                                {/* Increase Quantity Button */}
+
                                 <button
                                   className="mb-6 mt-5"
                                   data-testid="cart-item-amount-increase"
@@ -272,8 +245,6 @@ class CartOverlay extends Component {
                                 >
                                   <CiSquarePlus />
                                 </button>
-
-                                {/* Item Quantity Display */}
                                 <span
                                   className="mb-6"
                                   data-testid="cart-item-amount"
@@ -281,7 +252,6 @@ class CartOverlay extends Component {
                                   {item.quantity ? item.quantity : 1}
                                 </span>
 
-                                {/* Decrease Quantity Button */}
                                 <button
                                   data-testid="cart-item-amount-decrease"
                                   onClick={() =>
@@ -296,18 +266,16 @@ class CartOverlay extends Component {
                                 </button>
                               </div>
 
-                              {/* Item Image */}
                               <div className="w-full max-w-[120px] h-auto overflow-hidden flex justify-center">
                                 <img
                                   src={item.gallery[0].image_url}
                                   alt={item.name}
                                   className="object-cover w-full h-full"
-                                  style={{ maxHeight: "120px" }} // Limit the maximum height of the image
+                                  style={{ maxHeight: "120px" }} 
                                 />
                               </div>
                             </div>
 
-                            {/* Remove Item Button */}
                             <div className="flex flex-row">
                               <button
                                 className="text-xs mt-2 text-red-400"
@@ -326,9 +294,8 @@ class CartOverlay extends Component {
                       ))}
                     </div>
 
-                    {/* Fixed Footer Section */}
+
                     <div className="border-t pt-4">
-                      {/* Total Price Display */}
                       <div className="flex justify-between">
                         <span
                           className="font-semibold"
@@ -341,7 +308,6 @@ class CartOverlay extends Component {
                         </span>
                       </div>
 
-                      {/* Place Order Button */}
                       <button
                         onClick={() => this.handlePlaceOrder(createOrder)}
                         className="w-full bg-green-500 text-white py-2 mt-4 rounded"
