@@ -15,12 +15,8 @@ class ProductDetailPage extends Component {
       isAddToCartEnabled: false,
       currentImageIndex: 0,
     };
-    console.log("ProductDetailPage loaded");
   }
 
-  componentWillUnmount() {
-    console.log("ProductDetailPage unmounted");
-  }
 
   handleImageSelect = (imageUrl, gallery) => {
     if (!gallery) return;
@@ -79,7 +75,6 @@ class ProductDetailPage extends Component {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    console.log("Cart updated:", cart);
 
     window.scrollTo({
       top: 0,

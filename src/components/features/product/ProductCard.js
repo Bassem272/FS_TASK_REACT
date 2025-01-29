@@ -15,9 +15,6 @@ class ProductCard extends Component {
     const { product, addToCart } = this.props;
 
     if (!product.inStock) {
-      console.log(
-        `${product.name} is out of stock and cannot be added to the cart.`
-      );
       return;
     }
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -38,7 +35,6 @@ class ProductCard extends Component {
       localStorage.setItem("cart", JSON.stringify(cart));
 
       addToCart(productToAdd);
-      console.log(`${product.name} added to cart`);
 
       this.setState({ isCartOpen: true });
 
@@ -52,9 +48,7 @@ class ProductCard extends Component {
       setTimeout(() => {
         toggle();
       }, scrollTime);
-    } else {
-      console.log(`${product.name} is already in the cart`);
-    }
+    } 
   };
 
   render() {

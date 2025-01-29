@@ -124,7 +124,6 @@ class CartOverlay extends Component {
         variables: {userId: "user123", items }, 
       });
 
-      console.log("Order placed successfully:", response.data);
       alert("Order placed successfully!");
 
       localStorage.removeItem("cart");
@@ -132,7 +131,6 @@ class CartOverlay extends Component {
 
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
-      console.error("Error placing order:", err);
       alert("Error placing order!",err);
     }
   };
