@@ -1,4 +1,3 @@
-// src/graphql/queries.js
 import { gql } from "@apollo/client";
 
 export const GET_PRODUCTS = gql`
@@ -58,7 +57,7 @@ export const GET_PRODUCT = gql`
       attributes {
         id
         name
-        type 
+        type
         attribute_items {
           id
           displayValue
@@ -69,7 +68,6 @@ export const GET_PRODUCT = gql`
   }
 `;
 
-// Define the GraphQL query for the categories 
 export const GET_CATEGORIES = gql`
   query GetCategories {
     categories {

@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Query } from "@apollo/client/react/components";
-import { GET_PRODUCTS } from "../graphql/queries"; // Import query
+import { GET_PRODUCTS } from "../graphql/queries";
 import ProductCard from "../components/features/product/ProductCard";
 
 class ProductListPage extends Component {
   render() {
-    const { addToCart, activeCategory } = this.props; // Destructure props
+    const { addToCart, activeCategory } = this.props;
 
     return (
       <div className="container mx-auto px-4 pb-6 sm:px-6 lg:px-8">
