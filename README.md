@@ -110,3 +110,5 @@ We welcome contributions to this project! If you'd like to contribute:
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+---
