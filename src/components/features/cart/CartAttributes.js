@@ -10,6 +10,26 @@ class CartAttributes extends Component {
     };
   }
 
+  componentDidMount() {
+    this.initializeAttributes();
+  }
+  initializeAttributes() {
+    let initialAttributes = {};
+    console.log("here n the cart attributes", this.props.item)
+  
+    if (this.props.item.fromDetailsPage) {
+      this.props.item.selectedAttributes.forEach(attribute => {
+        initialAttributes[attribute.key] = attribute.value;
+      });
+    } else {
+      this.props.item.attributes.forEach(attribute => {
+        initialAttributes[attribute.name] = attribute.attribute_items[0].value;
+      });
+    }
+  
+    this.setState({ selectedAttributes: initialAttributes });
+  }
+  
   handleAttributeClick = (attributeName, value) => {
     this.setState(
       (prevState) => ({
@@ -29,7 +49,7 @@ class CartAttributes extends Component {
   };
 
   checkIfAllAttributesSelected = () => {
-    const { attributes } = this.props;
+    const { attributes } = this.props.item;
     const { selectedAttributes } = this.state;
 
     return attributes.every((attr) =>
@@ -49,7 +69,7 @@ class CartAttributes extends Component {
   };
 
   render() {
-    const { attributes } = this.props;
+    const { attributes } = this.props.item;
     const { selectedAttributes } = this.state;
 
     return (

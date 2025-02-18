@@ -14,11 +14,22 @@ class CartOverlay extends Component {
       noProducts: false,
       hoveredIndex: null, 
     };
+    this.scrollToLastProduct = this.scrollToLastProduct.bind(this);
   }
  
+  scrollToLastProduct = () => {
+    const container = document.getElementById("cart-container");
+    const lastChild = container ? container.lastElementChild : null;
+
+    if (lastChild) {
+      container.scrollTo({
+        top: lastChild.offsetTop,
+        behavior: 'smooth',
+      });
+    }
+  }
   componentDidMount() {
     const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-
     const totalItems = cartItems.reduce((total, item) => {
       const quantity =
         item.quantity && typeof item.quantity === "number" && item.quantity > 0
@@ -29,6 +40,8 @@ class CartOverlay extends Component {
 
     this.setState({ totalItems });
     document.body.style.overflow = "hidden";
+    this.scrollToLastProduct();
+
   }
 
   componentWillUnmount() {
@@ -192,7 +205,7 @@ class CartOverlay extends Component {
                       My Bag: {totalItems} {totalItems > 1 ? "Items" : "Item"}
                     </h2>
 
-                    <div className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-gray-200 p-5">
+                    <div id="cart-container" className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-gray-200 p-5">
                       {cartItems.map((item, index) => (
                   <div
                   key={index}
@@ -214,7 +227,7 @@ class CartOverlay extends Component {
 
                             {item.attributes.length > 0 && (
                               <CartAttributes
-                                attributes={item.attributes}
+                                item={item}
                                 onAttributeChange={(selectedAttributes) =>
                                   this.handleAttributeChange(
                                     item.id,

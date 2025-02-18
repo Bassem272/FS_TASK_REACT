@@ -50,7 +50,9 @@ class ProductDetailPage extends Component {
     this.setState({
       selectedAttributes,
       isAddToCartEnabled: true,
-    });
+    },
+    );
+
   };
 
   handleAddToCart = (product, toggle) => {
@@ -69,8 +71,12 @@ class ProductDetailPage extends Component {
     } else {
       cart.push({
         ...product,
-        selectedAttributes: { ...selectedAttributes },
+        selectedAttributes: Object.entries(selectedAttributes).map(([key, value]) => ({
+          key,
+          value,
+        })),
         quantity: 1,
+        fromDetailsPage:true,  
       });
     }
 

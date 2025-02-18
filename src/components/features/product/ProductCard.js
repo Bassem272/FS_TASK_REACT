@@ -29,6 +29,7 @@ class ProductCard extends Component {
           product.attributes.length > 0
             ? product.attributes[0].attribute_items[0]
             : {},
+           fromDetailsPage:false,
       };
 
       this.setState({ cartItems: cart });
